@@ -6,6 +6,176 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+  role     Role   @default(USER)
+
+  // relations
+  tasks                  Task[]
+  sprints                Sprint[]
+  projectsParticipating  Project[]                @relation("projectsWhereIAmMember")
+  projectsManaging       Project[]                @relation("projectsWhereIAmAdmin")
+  organizationsOwned     Organization[]           @relation("organizationsWhereIAmOwner")
+  OrganizationMembers    OrganizationMembers[]
+  ProjectLevelPermission ProjectLevelPermission[]
+
+  @@index(email)
+}
+
+// this is where we deine the organizations and te members
+// of the organizations relation, and we also define the
+// default permissions of the members of the organizations in
+// the projects of the organization
+model OrganizationMembers {
+  id                          String       @id @default(uuid())
+  organizationsBasePermission Permission
+  member                      User         @relation(fields: [userId], references: [id])
+  userId                      String
+  organization                Organization @relation(fields: [organizationId], references: [id])
+  organizationId              String
+
+  @@unique([organizationId, userId])
+  @@index(userId)
+}
+
+// if NONE, user can't see the organizations projects
+// where he is not a member
+
+// if READ, user can see the organizations projects
+// even if he is not a member
+
+// if MODIFY, user can see the organizations projects
+// even if he is not a member and can modify them, and assign
+// members and himself to them
+enum Permission {
+  NONE
+  READ
+  MODIFY
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Organization {
+  id   String @id @default(uuid())
+  name String
+
+  // relations
+  owner               User?                 @relation("organizationsWhereIAmOwner", fields: [userId], references: [id])
+  userId              String?
+  projects            Project[]
+  OrganizationMembers OrganizationMembers[]
+}
+
+model ProjectLevelPermission {
+  id                String     @id @default(uuid())
+  projectPermission Permission
+  user              User       @relation(fields: [userId], references: [id])
+  project           Project    @relation(fields: [projectId], references: [id])
+  projectId         String
+  userId            String
+
+  @@unique([projectId, userId])
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  name        String
+  description String
+  startDate   DateTime  @default(now())
+  endDate     DateTime?
+
+  // relations
+  admin                   User                     @relation("projectsWhereIAmAdmin", fields: [userId], references: [id])
+  userId                  String
+  organization            Organization?            @relation(fields: [organizationId], references: [id])
+  organizationId          String?
+  tasks                   Task[]
+  sprints                 Sprint[]
+  columns                 Column[]
+  members                 User[]                   @relation("projectsWhereIAmMember")
+  projectLevelPermissions ProjectLevelPermission[]
+}
+
+model Sprint {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  startDate   DateTime @default(now())
+  endDate     DateTime
+  updatedAt   DateTime @updatedAt
+
+  // relations
+  createdBy User    @relation(fields: [userId], references: [id])
+  userId    String
+  Project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  tasks     Task[]
+}
+
+model Column {
+  id        String  @id @default(uuid())
+  name      String  @unique
+  color     String  @default("#000000")
+  // relations
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  tasks     Task[]
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  dueDate     DateTime
+
+  // relations
+  assignedTo  User?        @relation(fields: [userId], references: [id])
+  userId      String?
+  priority    Priority
+  Project     Project      @relation(fields: [projectId], references: [id])
+  projectId   String
+  column      Column       @relation(fields: [columnId], references: [id])
+  columnId    String
+  sprint      Sprint       @relation(fields: [sprintId], references: [id])
+  sprintId    String
+  comments    Comment[]
+  attachments attachment[]
+}
+
+model attachment {
+  id        String   @id @default(uuid())
+  url       String
+  createdAt DateTime @default(now())
+
+  // relations
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  text      String
+  createdAt DateTime @default(now())
+
+  // relations
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String
+}
+
+enum Priority {
+  ULTRA_LOW
+  LOW
+  MEDIUM
+  HIGH
+  ULTRA_HIGH
 }
