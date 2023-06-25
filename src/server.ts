@@ -1,15 +1,20 @@
 import express from "express";
 import userRouter from "./routes/user.routes";
+import taskRoutes from "./routes/task.routes";
+import attachmentRoutes from "./routes/attachment.routes";
+import projectRoutes from "./routes/project.routes";
+import commentRoutes from "./routes/comment.routes";
+import sprintRoutes from "./routes/sprint.routes";
+import columnRoutes from "./routes/column.routes";
 
 const app = express();
 
-app.use("/api", (req, res, next) => {
-  console.log("ITS WORKINg");
-  next();
-});
+app.use(express.json());
 app.use("/api", userRouter);
-
-app.get("**", (_, res) => {
-  res.send("HWATTTTTTTT");
-});
+app.use("/api", taskRoutes);
+app.use("/api", attachmentRoutes);
+app.use("/api", projectRoutes);
+app.use("/api", commentRoutes);
+app.use("/api", sprintRoutes);
+app.use("/api", columnRoutes);
 app.listen(3000, () => console.log("Server UP"));

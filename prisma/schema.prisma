@@ -98,7 +98,6 @@ model Project {
   userId                  String
   organization            Organization?            @relation(fields: [organizationId], references: [id])
   organizationId          String?
-  tasks                   Task[]
   sprints                 Sprint[]
   columns                 Column[]
   members                 User[]                   @relation("projectsWhereIAmMember")
@@ -106,12 +105,12 @@ model Project {
 }
 
 model Sprint {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String?
-  startDate   DateTime @default(now())
-  endDate     DateTime
-  updatedAt   DateTime @updatedAt
+  startDate   DateTime  @default(now())
+  endDate     DateTime?
+  updatedAt   DateTime  @updatedAt
 
   // relations
   createdBy User    @relation(fields: [userId], references: [id])
@@ -123,27 +122,27 @@ model Sprint {
 
 model Column {
   id        String  @id @default(uuid())
-  name      String  @unique
+  name      String
   color     String  @default("#000000")
   // relations
   project   Project @relation(fields: [projectId], references: [id])
   projectId String
   tasks     Task[]
+
+  @@unique([projectId, name])
 }
 
 model Task {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  dueDate     DateTime
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  dueDate     DateTime?
 
   // relations
   assignedTo  User?        @relation(fields: [userId], references: [id])
   userId      String?
   priority    Priority
-  Project     Project      @relation(fields: [projectId], references: [id])
-  projectId   String
   column      Column       @relation(fields: [columnId], references: [id])
   columnId    String
   sprint      Sprint       @relation(fields: [sprintId], references: [id])
