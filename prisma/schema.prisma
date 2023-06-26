@@ -35,13 +35,13 @@ model User {
 model OrganizationMembers {
   id                          String       @id @default(uuid())
   organizationsBasePermission Permission
-  member                      User         @relation(fields: [userId], references: [id])
-  userId                      String
+  member                      User         @relation(fields: [memberUserId], references: [id])
+  memberUserId                String
   organization                Organization @relation(fields: [organizationId], references: [id])
   organizationId              String
 
-  @@unique([organizationId, userId])
-  @@index(userId)
+  @@unique([organizationId, memberUserId])
+  @@index(memberUserId)
 }
 
 // if NONE, user can't see the organizations projects
@@ -69,8 +69,8 @@ model Organization {
   name String
 
   // relations
-  owner               User?                 @relation("organizationsWhereIAmOwner", fields: [userId], references: [id])
-  userId              String?
+  owner               User?                 @relation("organizationsWhereIAmOwner", fields: [ownerId], references: [id])
+  ownerId             String?
   projects            Project[]
   OrganizationMembers OrganizationMembers[]
 }
@@ -78,10 +78,12 @@ model Organization {
 model ProjectLevelPermission {
   id                String     @id @default(uuid())
   projectPermission Permission
-  user              User       @relation(fields: [userId], references: [id])
-  project           Project    @relation(fields: [projectId], references: [id])
-  projectId         String
-  userId            String
+
+  // relations
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
 
   @@unique([projectId, userId])
 }
@@ -94,8 +96,8 @@ model Project {
   endDate     DateTime?
 
   // relations
-  admin                   User                     @relation("projectsWhereIAmAdmin", fields: [userId], references: [id])
-  userId                  String
+  admin                   User                     @relation("projectsWhereIAmAdmin", fields: [adminId], references: [id])
+  adminId                 String                  
   organization            Organization?            @relation(fields: [organizationId], references: [id])
   organizationId          String?
   sprints                 Sprint[]
@@ -113,11 +115,11 @@ model Sprint {
   updatedAt   DateTime  @updatedAt
 
   // relations
-  createdBy User    @relation(fields: [userId], references: [id])
-  userId    String
-  Project   Project @relation(fields: [projectId], references: [id])
-  projectId String
-  tasks     Task[]
+  createdBy       User    @relation(fields: [createdByUserId], references: [id])
+  createdByUserId String  
+  project         Project @relation(fields: [projectId], references: [id])
+  projectId       String
+  tasks           Task[]
 }
 
 model Column {
@@ -140,15 +142,15 @@ model Task {
   dueDate     DateTime?
 
   // relations
-  assignedTo  User?        @relation(fields: [userId], references: [id])
-  userId      String?
-  priority    Priority
-  column      Column       @relation(fields: [columnId], references: [id])
-  columnId    String
-  sprint      Sprint       @relation(fields: [sprintId], references: [id])
-  sprintId    String
-  comments    Comment[]
-  attachments attachment[]
+  priority         Priority
+  assignedTo       User?        @relation(fields: [assignedToUserId], references: [id])
+  assignedToUserId String?
+  column           Column       @relation(fields: [columnId], references: [id])
+  columnId         String
+  sprint           Sprint       @relation(fields: [sprintId], references: [id])
+  sprintId         String
+  comments         Comment[]
+  attachments      attachment[]
 }
 
 model attachment {
