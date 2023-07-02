@@ -97,7 +97,7 @@ model Project {
 
   // relations
   admin                   User                     @relation("projectsWhereIAmAdmin", fields: [adminId], references: [id])
-  adminId                 String                  
+  adminId                 String
   organization            Organization?            @relation(fields: [organizationId], references: [id])
   organizationId          String?
   sprints                 Sprint[]
@@ -116,7 +116,7 @@ model Sprint {
 
   // relations
   createdBy       User    @relation(fields: [createdByUserId], references: [id])
-  createdByUserId String  
+  createdByUserId String
   project         Project @relation(fields: [projectId], references: [id])
   projectId       String
   tasks           Task[]
@@ -150,10 +150,10 @@ model Task {
   sprint           Sprint       @relation(fields: [sprintId], references: [id])
   sprintId         String
   comments         Comment[]
-  attachments      attachment[]
+  attachments      Attachment[]
 }
 
-model attachment {
+model Attachment {
   id        String   @id @default(uuid())
   url       String
   createdAt DateTime @default(now())
