@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 
 const createBasicRoute = (
-    entityName: string
+  entityName: string
 ): string => `import { Router } from "express";
 import handleError from "../errorHadler";
 import prisma from "../dao/connection"
@@ -75,19 +75,19 @@ export default router;
 // here put the entities to create, also, remember to create the entity in
 // the database first and to NOT override already created entities
 const entities: string[] = [
-    // "user",
-    // "project",
-    // "sprint",
-    // "task",
-    // "comment",
-    // "column",
-    // "attachment",
-    "test-entity"
+  // "user",
+  // "project",
+  // "sprint",
+  // "task",
+  // "comment",
+  // "column",
+  // "attachment",
+  "test-entity",
 ];
 entities.forEach((entity) => {
-    console.log(path.join(__dirname, "src/routes", `${entity}.routes.ts`));
-    fs.writeFile(
-        path.join(__dirname, "src/routes", `${entity}.routes.ts`),
-        createBasicRoute(entity)
-    );
+  console.log(path.join(__dirname, "src/routes", `${entity}.routes.ts`));
+  fs.writeFile(
+    path.join(__dirname, "src/routes", `${entity}.routes.ts`),
+    createBasicRoute(entity)
+  );
 });

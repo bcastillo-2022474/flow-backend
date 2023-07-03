@@ -1,6 +1,6 @@
 import { Router } from "express";
 import handleError from "../errorHadler";
-import prisma from "../dao/connection"
+import prisma from "../dao/connection";
 
 const router = Router();
 
@@ -18,9 +18,11 @@ router
     res.json(columns);
   })
   .post(async (req, res) => {
-    const column = await prisma.column.create({
-      data: req.body,
-    }).catch(handleError(res));
+    const column = await prisma.column
+      .create({
+        data: req.body,
+      })
+      .catch(handleError(res));
 
     if (!column) return;
 
@@ -30,33 +32,39 @@ router
 router
   .route("/column/:id")
   .get(async (req, res) => {
-    const column = await prisma.column.findUnique({
-      where: {
-        id: req.params.id,
-      },
-    }).catch(handleError(res));
+    const column = await prisma.column
+      .findUnique({
+        where: {
+          id: req.params.id,
+        },
+      })
+      .catch(handleError(res));
 
     if (!column) return;
     res.json(column);
   })
   .put(async (req, res) => {
-    const column = await prisma.column.update({
-      where: {
-        id: req.params.id,
-      },
-      data: req.body,
-    }).catch(handleError(res));
+    const column = await prisma.column
+      .update({
+        where: {
+          id: req.params.id,
+        },
+        data: req.body,
+      })
+      .catch(handleError(res));
 
     if (!column) return;
 
     res.json(column);
   })
   .delete(async (req, res) => {
-    const column = await prisma.column.delete({
-      where: {
-        id: req.params.id,
-      },
-    }).catch(handleError(res));
+    const column = await prisma.column
+      .delete({
+        where: {
+          id: req.params.id,
+        },
+      })
+      .catch(handleError(res));
 
     if (!column) return;
 
@@ -64,4 +72,3 @@ router
   });
 
 export default router;
-  

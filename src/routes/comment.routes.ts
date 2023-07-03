@@ -1,6 +1,6 @@
 import { Router } from "express";
 import handleError from "../errorHadler";
-import prisma from "../dao/connection"
+import prisma from "../dao/connection";
 
 const router = Router();
 
@@ -18,9 +18,11 @@ router
     res.json(comments);
   })
   .post(async (req, res) => {
-    const comment = await prisma.comment.create({
-      data: req.body,
-    }).catch(handleError(res));
+    const comment = await prisma.comment
+      .create({
+        data: req.body,
+      })
+      .catch(handleError(res));
 
     if (!comment) return;
 
@@ -30,33 +32,39 @@ router
 router
   .route("/comment/:id")
   .get(async (req, res) => {
-    const comment = await prisma.comment.findUnique({
-      where: {
-        id: req.params.id,
-      },
-    }).catch(handleError(res));
+    const comment = await prisma.comment
+      .findUnique({
+        where: {
+          id: req.params.id,
+        },
+      })
+      .catch(handleError(res));
 
     if (!comment) return;
     res.json(comment);
   })
   .put(async (req, res) => {
-    const comment = await prisma.comment.update({
-      where: {
-        id: req.params.id,
-      },
-      data: req.body,
-    }).catch(handleError(res));
+    const comment = await prisma.comment
+      .update({
+        where: {
+          id: req.params.id,
+        },
+        data: req.body,
+      })
+      .catch(handleError(res));
 
     if (!comment) return;
 
     res.json(comment);
   })
   .delete(async (req, res) => {
-    const comment = await prisma.comment.delete({
-      where: {
-        id: req.params.id,
-      },
-    }).catch(handleError(res));
+    const comment = await prisma.comment
+      .delete({
+        where: {
+          id: req.params.id,
+        },
+      })
+      .catch(handleError(res));
 
     if (!comment) return;
 
@@ -64,4 +72,3 @@ router
   });
 
 export default router;
-  
