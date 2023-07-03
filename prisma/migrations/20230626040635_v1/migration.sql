@@ -14,11 +14,11 @@ CREATE TABLE `User` (
 CREATE TABLE `OrganizationMembers` (
     `id` VARCHAR(191) NOT NULL,
     `organizationsBasePermission` ENUM('NONE', 'READ', 'MODIFY') NOT NULL,
-    `userId` VARCHAR(191) NOT NULL,
+    `memberUserId` VARCHAR(191) NOT NULL,
     `organizationId` VARCHAR(191) NOT NULL,
 
-    INDEX `OrganizationMembers_userId_idx`(`userId`),
-    UNIQUE INDEX `OrganizationMembers_organizationId_userId_key`(`organizationId`, `userId`),
+    INDEX `OrganizationMembers_memberUserId_idx`(`memberUserId`),
+    UNIQUE INDEX `OrganizationMembers_organizationId_memberUserId_key`(`organizationId`, `memberUserId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -26,7 +26,7 @@ CREATE TABLE `OrganizationMembers` (
 CREATE TABLE `Organization` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `userId` VARCHAR(191) NULL,
+    `ownerId` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -49,7 +49,7 @@ CREATE TABLE `Project` (
     `description` VARCHAR(191) NOT NULL,
     `startDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `endDate` DATETIME(3) NULL,
-    `userId` VARCHAR(191) NOT NULL,
+    `adminId` VARCHAR(191) NOT NULL,
     `organizationId` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
@@ -61,9 +61,9 @@ CREATE TABLE `Sprint` (
     `name` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NULL,
     `startDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `endDate` DATETIME(3) NOT NULL,
+    `endDate` DATETIME(3) NULL,
     `updatedAt` DATETIME(3) NOT NULL,
-    `userId` VARCHAR(191) NOT NULL,
+    `createdByUserId` VARCHAR(191) NOT NULL,
     `projectId` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -76,7 +76,7 @@ CREATE TABLE `Column` (
     `color` VARCHAR(191) NOT NULL DEFAULT '#000000',
     `projectId` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `Column_name_key`(`name`),
+    UNIQUE INDEX `Column_projectId_name_key`(`projectId`, `name`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -86,10 +86,9 @@ CREATE TABLE `Task` (
     `description` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
-    `dueDate` DATETIME(3) NOT NULL,
-    `userId` VARCHAR(191) NULL,
+    `dueDate` DATETIME(3) NULL,
     `priority` ENUM('ULTRA_LOW', 'LOW', 'MEDIUM', 'HIGH', 'ULTRA_HIGH') NOT NULL,
-    `projectId` VARCHAR(191) NOT NULL,
+    `assignedToUserId` VARCHAR(191) NULL,
     `columnId` VARCHAR(191) NOT NULL,
     `sprintId` VARCHAR(191) NOT NULL,
 
@@ -126,28 +125,28 @@ CREATE TABLE `_projectsWhereIAmMember` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `OrganizationMembers` ADD CONSTRAINT `OrganizationMembers_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `OrganizationMembers` ADD CONSTRAINT `OrganizationMembers_memberUserId_fkey` FOREIGN KEY (`memberUserId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `OrganizationMembers` ADD CONSTRAINT `OrganizationMembers_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Organization` ADD CONSTRAINT `Organization_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `ProjectLevelPermission` ADD CONSTRAINT `ProjectLevelPermission_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Organization` ADD CONSTRAINT `Organization_ownerId_fkey` FOREIGN KEY (`ownerId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ProjectLevelPermission` ADD CONSTRAINT `ProjectLevelPermission_projectId_fkey` FOREIGN KEY (`projectId`) REFERENCES `Project`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Project` ADD CONSTRAINT `Project_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ProjectLevelPermission` ADD CONSTRAINT `ProjectLevelPermission_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Project` ADD CONSTRAINT `Project_adminId_fkey` FOREIGN KEY (`adminId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Project` ADD CONSTRAINT `Project_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Sprint` ADD CONSTRAINT `Sprint_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Sprint` ADD CONSTRAINT `Sprint_createdByUserId_fkey` FOREIGN KEY (`createdByUserId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Sprint` ADD CONSTRAINT `Sprint_projectId_fkey` FOREIGN KEY (`projectId`) REFERENCES `Project`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -156,10 +155,7 @@ ALTER TABLE `Sprint` ADD CONSTRAINT `Sprint_projectId_fkey` FOREIGN KEY (`projec
 ALTER TABLE `Column` ADD CONSTRAINT `Column_projectId_fkey` FOREIGN KEY (`projectId`) REFERENCES `Project`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Task` ADD CONSTRAINT `Task_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Task` ADD CONSTRAINT `Task_projectId_fkey` FOREIGN KEY (`projectId`) REFERENCES `Project`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Task` ADD CONSTRAINT `Task_assignedToUserId_fkey` FOREIGN KEY (`assignedToUserId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Task` ADD CONSTRAINT `Task_columnId_fkey` FOREIGN KEY (`columnId`) REFERENCES `Column`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

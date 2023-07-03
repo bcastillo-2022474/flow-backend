@@ -7,6 +7,7 @@ import commentRoutes from "./routes/comment.routes";
 import sprintRoutes from "./routes/sprint.routes";
 import columnRoutes from "./routes/column.routes";
 
+const PORT = 3000;
 const app = express();
 
 app.use(express.json());
@@ -17,4 +18,5 @@ app.use("/api", projectRoutes);
 app.use("/api", commentRoutes);
 app.use("/api", sprintRoutes);
 app.use("/api", columnRoutes);
-app.listen(3000, () => console.log("Server UP"));
+
+app.listen(PORT, () => console.log(`Server UP in ${PORT}`));
