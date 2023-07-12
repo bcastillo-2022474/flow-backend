@@ -82,7 +82,10 @@ const entities: string[] = [
   // "comment",
   // "column",
   // "attachment",
-  "test-entity",
+  // "test-entity",
+  "OrganizationMembers",
+  "Organization",
+  "ProjectLevelPermission"
 ];
 entities.forEach((entity) => {
   console.log(path.join(__dirname, "src/routes", `${entity}.routes.ts`));

@@ -35,6 +35,8 @@ model User {
 model OrganizationMembers {
   id                          String       @id @default(uuid())
   organizationsBasePermission Permission
+
+  // * Relations
   member                      User         @relation(fields: [memberUserId], references: [id])
   memberUserId                String
   organization                Organization @relation(fields: [organizationId], references: [id])

@@ -39,8 +39,8 @@ router
         },
         include: {
           assignedTo: true,
-          attachments: true,
-          comments: true,
+          attachments: false,
+          comments: false,
           sprint: true,
           column: true,
         },

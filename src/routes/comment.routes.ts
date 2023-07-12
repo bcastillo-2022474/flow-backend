@@ -37,6 +37,9 @@ router
         where: {
           id: req.params.id,
         },
+        include: {
+          task: true
+        }
       })
       .catch(handleError(res));
 

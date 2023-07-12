@@ -38,6 +38,15 @@ router
         where: {
           id: req.params.id,
         },
+        include: {
+          tasks: true,
+          sprints: true,
+          projectsParticipating: true,
+          projectsManaging: true,
+          organizationsOwned: false,
+          OrganizationMembers: false,
+          ProjectLevelPermission: true,
+        }
       })
       .catch(handleError(res));
 

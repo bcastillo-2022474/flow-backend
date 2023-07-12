@@ -44,6 +44,9 @@ router
           id: req.params.id,
         },
         include: {
+          admin: false,
+          organization: false,
+          projectLevelPermissions: false,
           members: true,
           sprints: true,
           columns: true,
