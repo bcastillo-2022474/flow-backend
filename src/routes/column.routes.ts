@@ -38,8 +38,8 @@ router
           id: req.params.id,
         },
         include: {
-          project: true
-        }
+          project: true,
+        },
       })
       .catch(handleError(res));
 

@@ -46,7 +46,7 @@ router
           organizationsOwned: false,
           OrganizationMembers: false,
           ProjectLevelPermission: true,
-        }
+        },
       })
       .catch(handleError(res));
 

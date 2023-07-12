@@ -40,8 +40,8 @@ router
         include: {
           createdBy: true,
           project: true,
-          tasks: true
-        }
+          tasks: true,
+        },
       })
       .catch(handleError(res));
 

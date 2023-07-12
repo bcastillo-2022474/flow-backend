@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 
 const createBasicRoute = (
-  entityName: string
+  entityName: string,
 ): string => `import { Router } from "express";
 import handleError from "../errorHadler";
 import prisma from "../dao/connection"
@@ -85,12 +85,12 @@ const entities: string[] = [
   // "test-entity",
   "OrganizationMembers",
   "Organization",
-  "ProjectLevelPermission"
+  "ProjectLevelPermission",
 ];
 entities.forEach((entity) => {
   console.log(path.join(__dirname, "src/routes", `${entity}.routes.ts`));
   fs.writeFile(
     path.join(__dirname, "src/routes", `${entity}.routes.ts`),
-    createBasicRoute(entity)
+    createBasicRoute(entity),
   );
 });
