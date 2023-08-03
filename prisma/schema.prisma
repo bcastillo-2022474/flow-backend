@@ -33,14 +33,14 @@ model User {
 // default permissions of the members of the organizations in
 // the projects of the organization
 model OrganizationMembers {
-  id                          String       @id @default(uuid())
+  id                          String     @id @default(uuid())
   organizationsBasePermission Permission
 
   // * Relations
-  member                      User         @relation(fields: [memberUserId], references: [id])
-  memberUserId                String
-  organization                Organization @relation(fields: [organizationId], references: [id])
-  organizationId              String
+  member         User         @relation(fields: [memberUserId], references: [id])
+  memberUserId   String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
 
   @@unique([organizationId, memberUserId])
   @@index(memberUserId)
@@ -182,3 +182,10 @@ enum Priority {
   HIGH
   ULTRA_HIGH
 }
+
+// model Session {
+//   id        String   @id
+//   sid       String   @unique
+//   data      String
+//   expiresAt DateTime
+// }

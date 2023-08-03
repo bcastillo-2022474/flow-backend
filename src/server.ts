@@ -6,11 +6,13 @@ import projectRoutes from "./routes/project.routes";
 import commentRoutes from "./routes/comment.routes";
 import sprintRoutes from "./routes/sprint.routes";
 import columnRoutes from "./routes/column.routes";
+import signInUpRoutes from "./routes/sign-in-up.routes";
 
-const PORT = 3000;
+const { PORT } = process.env;
 const app = express();
 
 app.use(express.json());
+app.use("/api", signInUpRoutes);
 app.use("/api", userRouter);
 app.use("/api", taskRoutes);
 app.use("/api", attachmentRoutes);
